@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if [[ `git config --get hooks.testing` == "true" ]]; then
+  echo "### Githooks testing calling $0 with arguments: $*"
+  echo "### End Githooks testing"
+fi

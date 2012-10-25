@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Try to find a working version of readlink
+READLINK=`which greadlink 2> /dev/null`
+if [ -z $READLINK ]; then
+  READLINK=`which readlink 2> /dev/null`
+fi
+
+# Check to see that they have GNU readlink installed
+if [[ -z `$READLINK --version 2>&1 | grep GNU` ]]; then
+  echo "You must have the GNU version of readlink installed to run this script"
+  exit 1
+fi
+
+HOOK=$(basename $0)
+HOOK_DIR="/hooks/$HOOK"
+TESTING=`git config --get hooks.testing`
+
+if [[ $TESTING == "true" ]]; then
+  echo "##### Running for hook: $HOOK..."
+fi
+
+# HACK HACK HACK
+# I need to capture standard in so I can re-stream it to all the child hooks, so I'll tee it to a tmp file first.
+# If for some reason git doesn't close standard in, this could break down horribly
+TEMPFILE=`mktemp /tmp/hooker.XXXXXX` || exit 1
+cat - > $TEMPFILE
+
+if [[ $TESTING == "true" ]]; then
+  echo "### Recieved the following on standard in and saved it to $TEMPFILE:"
+  cat $TEMPFILE
+fi
+
+# Run all the scripts in the directory for our chosen hook
+for fn in "$(dirname $($READLINK -f $0))/clients/**/$HOOK/*"; do
+  if [[ $TESTING == "true" ]]; then
+    echo "### Running $fn"
+  fi
+  cat $TEMPFILE | $fn $*
+  ret_val=$?
+  if [[ $ret_val -ne 0 ]]; then
+    echo "Action aborted."
+
+    # Clean up after ourselves
+    rm $TEMPFILE
+
+    # Well, that broke
+    exit $ret_val
+  fi
+done
+
+# Clean up after ourselves
+rm $TEMPFILE

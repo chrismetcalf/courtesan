@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Try to find a working version of readlink
+READLINK=`which greadlink`
+if [ -z $READLINK ]; then
+  READLINK=`which readlink`
+fi
+
+# Check to see that they have GNU readlink installed
+if [[ -z `$READLINK --version 2>&1 | grep GNU` ]]; then
+  echo "You must have the GNU version of readlink installed to run this script"
+  exit 1
+fi
+
+GITHOOK_DIR="$(dirname $($READLINK -f $0))/install_hooks"
+GIT_DIR=`git rev-parse --git-dir`
+
+if [ -z $GITHOOK_DIR ]; then
+  echo "Could not use readlink to get directory to githooks scripts. Check that you have the GNU readlink utility installed and, if necessary, aliased to \"readlink\""
+  exit 1
+fi
+
+if [ -z $GIT_DIR ]; then
+  echo "Current directory is not a git repository. Exiting."
+  exit 1
+fi
+
+echo "Creating githooks directory"
+mkdir -p $GIT_DIR/hooks
+
+echo "Installing githooks from $GITHOOK_DIR to $GIT_DIR/hooks"
+for fn in $GITHOOK_DIR/*; do
+  ln -sf $fn $GIT_DIR/hooks/
+done
