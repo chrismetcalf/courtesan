@@ -18,6 +18,10 @@ You'll need to take some steps to set up courtesan, but after set up its pretty 
 2. Add packages of hooks to the `clients` directory. You can reference the "testing" client to see the directory structure you can use. I recommend adding your packages as git submodules, but that's up to you.
 3. From within the git repo you want to add hooks to, run courtesan's `install` script. It'll automatically symlink itself into place.
 
+## Ordering of hooks
+
+Courtesan uses Debian's braindead-simple method of ordering execution - it simply executes scripts in alphabetical order. If you want your script to run earlier, simply give it a lower index number and it'll order itself higher.
+
 ## Debugging
 
 If you set `hooks.testing = true` in your git config, courtesan will politely output debugging details that will help.
