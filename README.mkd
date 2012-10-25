@@ -1,0 +1,23 @@
+# Courtesan
+## A classy way of managing your git hooks
+
+courtesan |ˈkôrtəzən, ˈkər-| - **noun** - a prostitute, esp. one with wealthy or upper-class clients.
+ORIGIN mid 16th cent.: from French courtisane, from obsolete Italian cortigiana, feminine of cortigiano ‘courtier,’ from corte (see court) .
+
+## Background
+
+I was looking for a simpler way of managing the installation and running of [git hooks](http://www.kernel.org/pub/software/scm/git/docs/githooks.html), those wonderful bits of magic that help you validate, manage, and automate your git workflows. However, out of the box, they're difficult to manage since you can only apply a single git hook per action on a given repo. Why not, then, create a system for managing and ordering the actions of scripts that run as git hooks, and simplify their installation.
+
+The first version worked well, but had a less-than-savory name. This is her much more classy and cultured friend.
+
+## Usage
+
+You'll need to take some steps to set up courtesan, but after set up its pretty easy to install githooks into a new repo:
+
+1. Clone the courtesan repo onto the same machine as the git repo you want your hooks to run on. If you want to run local hooks, that'll be your local machine, or if you want to run hooks on a shared repo, it'll be on the same machine as your shared repo.
+2. Add packages of hooks to the `clients` directory. You can reference the "testing" client to see the directory structure you can use. I recommend adding your packages as git submodules, but that's up to you.
+3. From within the git repo you want to add hooks to, run courtesan's `install` script. It'll automatically symlink itself into place.
+
+## Debugging
+
+If you set `hooks.testing = true` in your git config, courtesan will politely output debugging details that will help.
